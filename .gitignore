@@ -1,0 +1,44 @@
+# Visual Studio
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Build output
+bin/
+obj/
+[Bb]uild/
+[Dd]ebug/
+[Rr]elease/
+x64/
+x86/
+
+# NuGet packages
+packages/
+*.nupkg
+
+# Logs
+Exceptionlogs/
+*.log
+logs/
+
+# Publish profiles
+*.pubxml
+*.pubxml.user
+Properties/PublishProfiles/
+WebApplication1/Properties/PublishProfiles/
+
+# Environment / secrets
+.env
+.env.*
+secrets.json
+
+# Database backups/files
+*.mdf
+*.ldf
+*.bak
+
+# OS files
+.DS_Store
+Thumbs.db
