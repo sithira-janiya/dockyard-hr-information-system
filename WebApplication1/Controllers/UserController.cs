@@ -1,33 +1,24 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
-using System.Web.Mvc;
+﻿using System.Web.Mvc;
 using WebApplication1.Interfaces;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace WebApplication1.Controllers
 {
     public class UserController : Controller
     {
-        private readonly IUser _User;
-
-        //DATest DATest = new DATest();
+        private readonly IUser _user;
 
         public UserController(IUser user)
         {
-            _User = user;
+            _user = user;
         }
 
-        // GET: Test
-
+        // GET: /User/GetUserDetails
         [HttpGet]
-        public ActionResult User()
+        public ActionResult GetUserDetails()
         {
-            var result = _User.User();
+            var result = _user.User();
+
             return Json(result, JsonRequestBehavior.AllowGet);
         }
-
-
     }
 }
