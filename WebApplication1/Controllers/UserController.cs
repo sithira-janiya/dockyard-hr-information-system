@@ -6,7 +6,7 @@ namespace WebApplication1.Controllers
     public class UserController : Controller
     {
         private readonly IUser _user;
-
+        
         public UserController(IUser user)
         {
             _user = user;
