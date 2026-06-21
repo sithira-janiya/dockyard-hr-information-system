@@ -5,7 +5,7 @@ using System.Linq;
 using System.Web;
 using WebApplication1.Interfaces;
 using WebApplication1.Models;
-using WebApplication1.Database_Layer;
+using WebApplication1.DataBaseConnectivity;
 
 namespace WebApplication1.DataAccess
 {
