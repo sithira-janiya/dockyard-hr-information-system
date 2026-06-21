@@ -14,12 +14,7 @@ namespace WebApplication1.Database_Layer
         public DBconnect()
         {
             _connectionString = string.Format(
-                @"Data Source=SITHIRA\SQLEXPRESS;" +
-                "Initial Catalog=DockyardHRDB;" +
-                "User ID=dockyard_user;" +
-                "Password=Dockyard@12345;" +
-                "MultipleActiveResultSets=True;" +
-                "TrustServerCertificate=True;");
+                //Connection string
         }
 
         public SqlConnection GetOpenConnection()
