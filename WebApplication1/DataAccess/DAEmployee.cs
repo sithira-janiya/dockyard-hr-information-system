@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
-using WebApplication1.DataBaseConnectivity;
+using WebApplication1.Database_Layer;
 using WebApplication1.Interfaces;
 using WebApplication1.Models;
 using WebApplication1.Models.RequestApiModels;
@@ -130,9 +130,7 @@ namespace WebApplication1.DataAccess
                 using (SqlConnection connection = dbConnect.GetOpenConnection())
                 using (SqlCommand command = new SqlCommand(query, connection))
                 {
-                    command.Parameters.Add(
-                        "@EmployeeID",
-                        SqlDbType.Int).Value = employeeId;
+                    command.Parameters.Add("@EmployeeID", SqlDbType.Int).Value = employeeId;
 
                     using (SqlDataReader reader = command.ExecuteReader())
                     {
@@ -226,8 +224,7 @@ namespace WebApplication1.DataAccess
                         designationId,
                         educationId);
 
-                    newEmployeeId =
-                        Convert.ToInt32(command.ExecuteScalar());
+                    newEmployeeId = Convert.ToInt32(command.ExecuteScalar());
                 }
 
                 response.StatusCode = 200;
@@ -292,9 +289,7 @@ namespace WebApplication1.DataAccess
                 using (SqlConnection connection = dbConnect.GetOpenConnection())
                 using (SqlCommand command = new SqlCommand(query, connection))
                 {
-                    command.Parameters.Add(
-                        "@EmployeeID",
-                        SqlDbType.Int).Value = employeeId;
+                    command.Parameters.Add("@EmployeeID", SqlDbType.Int).Value = employeeId;
 
                     AddEmployeeParameters(
                         command,
@@ -371,21 +366,10 @@ namespace WebApplication1.DataAccess
                     ? (object)DBNull.Value
                     : requestAPI.EmployeeAddress.Trim();
 
-            command.Parameters.Add(
-                "@LocationID",
-                SqlDbType.Int).Value = locationId;
-
-            command.Parameters.Add(
-                "@TownID",
-                SqlDbType.Int).Value = townId;
-
-            command.Parameters.Add(
-                "@DesignationID",
-                SqlDbType.Int).Value = designationId;
-
-            command.Parameters.Add(
-                "@EducationID",
-                SqlDbType.Int).Value = educationId;
+            command.Parameters.Add("@LocationID", SqlDbType.Int).Value = locationId;
+            command.Parameters.Add("@TownID", SqlDbType.Int).Value = townId;
+            command.Parameters.Add("@DesignationID", SqlDbType.Int).Value = designationId;
+            command.Parameters.Add("@EducationID", SqlDbType.Int).Value = educationId;
         }
 
         private EmployeeModel MapEmployee(SqlDataReader reader)
