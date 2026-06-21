@@ -1,14 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Configuration;
 using System.Linq;
 using System.Web;
-using System.Web.Http;
 using System.Web.Mvc;
 using System.Web.Optimization;
 using System.Web.Routing;
-using Unity;
-using WebApplication1.DataAccess;
-using WebApplication1.Interfaces;
 
 namespace WebApplication1
 {
@@ -16,17 +12,41 @@ namespace WebApplication1
     {
         protected void Application_Start()
         {
-            //GlobalConfiguration.Configure(WebApiConfig.Register);
             AreaRegistration.RegisterAllAreas();
             FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);
             RouteConfig.RegisterRoutes(RouteTable.Routes);
             BundleConfig.RegisterBundles(BundleTable.Bundles);
 
-            AreaRegistration.RegisterAllAreas();
-            UnityContainer container = new UnityContainer();
             UnityConfig.RegisterComponents();
+        }
 
-            //container.RegisterType<ITest, DATest>();
+        protected void Application_BeginRequest(object sender, EventArgs e)
+        {
+            string origin = HttpContext.Current.Request.Headers["Origin"];
+
+            string allowedOriginsSetting =
+                ConfigurationManager.AppSettings["DOCKYARD_HR_ALLOWED_ORIGINS"]
+                ?? Environment.GetEnvironmentVariable("DOCKYARD_HR_ALLOWED_ORIGINS")
+                ?? "http://localhost:3000";
+
+            string[] allowedOrigins = allowedOriginsSetting
+                .Split(',')
+                .Select(item => item.Trim())
+                .Where(item => !string.IsNullOrWhiteSpace(item))
+                .ToArray();
+
+            if (!string.IsNullOrWhiteSpace(origin) && allowedOrigins.Contains(origin))
+            {
+                HttpContext.Current.Response.Headers.Set("Access-Control-Allow-Origin", origin);
+                HttpContext.Current.Response.Headers.Set("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+                HttpContext.Current.Response.Headers.Set("Access-Control-Allow-Headers", "Content-Type, Accept, X-Requested-With");
+            }
+
+            if (HttpContext.Current.Request.HttpMethod == "OPTIONS")
+            {
+                HttpContext.Current.Response.StatusCode = 200;
+                HttpContext.Current.ApplicationInstance.CompleteRequest();
+            }
         }
     }
 }
