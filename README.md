@@ -216,4 +216,4 @@ The backend currently supports employee data retrieval, employee save/update ope
 
 This backend is developed as part of the Dockyard HR Information System internship project.
 
-## special thanks - ms Lakmali(supervisor), Randeer withanage ,Sachith ,Isura punsara, & other developers 🤍
+## special thanks - ms Lakmali(supervisor), Randeer withanage ,Sachith Priyamantha ,Isura punsara, & other developers 🤍
