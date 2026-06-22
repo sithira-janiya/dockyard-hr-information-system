@@ -215,3 +215,5 @@ http://localhost:60748/Employee/GetEmployeeDetails
 The backend currently supports employee data retrieval, employee save/update operations, master data retrieval, frontend integration, and SQL Server database connectivity.
 
 This backend is developed as part of the Dockyard HR Information System internship project.
+
+## special thanks - ms Lakmali(supervisor), Randeer withanage ,Sachith ,Isura punsara, & other developers 🤍
