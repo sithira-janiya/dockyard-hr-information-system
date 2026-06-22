@@ -55,9 +55,18 @@ namespace WebApplication1.Controllers
             return Json(result, JsonRequestBehavior.AllowGet);
         }
 
-        public ActionResult Index()
+        [HttpGet]
+        public ActionResult GetPoliceStations(MasterDataRequestAPI requestAPI)
         {
-            return View();
+            var result = _masterData.GetPoliceStations(requestAPI);
+            return Json(result, JsonRequestBehavior.AllowGet);
+        }
+
+        [HttpGet]
+        public ActionResult GetElectionDivisions(MasterDataRequestAPI requestAPI)
+        {
+            var result = _masterData.GetElectionDivisions(requestAPI);
+            return Json(result, JsonRequestBehavior.AllowGet);
         }
     }
 }
