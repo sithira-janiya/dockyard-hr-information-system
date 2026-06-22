@@ -3,6 +3,7 @@ using System.Data;
 using System.Data.SqlClient;
 using System.Reflection;
 using WebApplication1.Models;
+using System.Configuration;
 
 namespace WebApplication1.Database_Layer
 {
@@ -14,7 +15,12 @@ namespace WebApplication1.Database_Layer
         public DBconnect()
         {
             _connectionString = string.Format(
-                //Connection string
+                @"Data Source=SITHIRA\SQLEXPRESS;" +
+                "Initial Catalog=DockyardHRDB;" +
+                "User ID=dockyard_user;" +
+                "Password=Dockyard@12345;" +
+                "MultipleActiveResultSets=True;" +
+                "TrustServerCertificate=True;");
         }
 
         public SqlConnection GetOpenConnection()
