@@ -19,11 +19,9 @@ namespace WebApplication1
             container.RegisterType<IEmployee, DAEmployee>();
             container.RegisterType<IMasterData, DAMasterData>();
             container.RegisterType<IEmployeeReport, DAEmployeeReport>();
-            container.RegisterType<IElectionLeave, DAElectionLeave>();
             container.RegisterType<IEmployee, DAEmployee>();
             container.RegisterType<IMasterData, DAMasterData>();
             container.RegisterType<IEmployeeReport, DAEmployeeReport>();
-            container.RegisterType<IElectionLeave, DAElectionLeave>();
 
             // Set the dependency resolver for MVC
             DependencyResolver.SetResolver(new UnityDependencyResolver(container));
