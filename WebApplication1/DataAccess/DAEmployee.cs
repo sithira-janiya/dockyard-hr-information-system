@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
-using WebApplication1.BusinessLayer;  // ← NEW: For DistanceCalculator
+using WebApplication1.BusinessLayer;
 using WebApplication1.Database_Layer;
 using WebApplication1.Interfaces;
 using WebApplication1.Models;
@@ -12,8 +12,8 @@ namespace WebApplication1.DataAccess
 {
     public class DAEmployee : IEmployee
     {
-
-        //Version 1.0
+ 
+        // 1. GET ALL EMPLOYEES (With PoliceStation & ElectionDivision)
         public Response GetEmployeeDetails(EmployeeRequestAPI requestAPI)
         {
             Response response = new Response();
@@ -35,7 +35,11 @@ namespace WebApplication1.DataAccess
                     G.Designation_ID,
                     G.Designation_Name,
                     EL.Education_ID,
-                    EL.Education_Level
+                    EL.Education_Level,
+                    PS.PoliceStation_ID,
+                    PS.PoliceStation_Name,
+                    ED.ElectionDivision_ID,
+                    ED.ElectionDivision_Name
                 FROM dbo.EmployeeDetails AS E
                 INNER JOIN dbo.Location AS L
                     ON E.Location_ID = L.Location_ID
@@ -49,6 +53,10 @@ namespace WebApplication1.DataAccess
                     ON E.Designation_ID = G.Designation_ID
                 INNER JOIN dbo.EducationLevel AS EL
                     ON E.Education_ID = EL.Education_ID
+                LEFT JOIN dbo.PoliceStation AS PS
+                    ON PS.PoliceStation_ID = E.PoliceStationID
+                LEFT JOIN dbo.ElectionDivision AS ED
+                    ON ED.ElectionDivision_ID = E.ElectionDivisionID
                 ORDER BY E.Employee_ID;";
 
             try
@@ -78,6 +86,9 @@ namespace WebApplication1.DataAccess
             return response;
         }
 
+        
+        // 2. GET EMPLOYEE BY ID (With PoliceStation & ElectionDivision)
+       
         public Response GetEmployeeById(EmployeeRequestAPI requestAPI)
         {
             Response response = new Response();
@@ -91,7 +102,6 @@ namespace WebApplication1.DataAccess
                 response.StatusCode = 400;
                 response.Result = "A valid EmployeeID is required";
                 response.ResultSet = null;
-
                 return response;
             }
 
@@ -111,7 +121,11 @@ namespace WebApplication1.DataAccess
                     G.Designation_ID,
                     G.Designation_Name,
                     EL.Education_ID,
-                    EL.Education_Level
+                    EL.Education_Level,
+                    PS.PoliceStation_ID,
+                    PS.PoliceStation_Name,
+                    ED.ElectionDivision_ID,
+                    ED.ElectionDivision_Name
                 FROM dbo.EmployeeDetails AS E
                 INNER JOIN dbo.Location AS L
                     ON E.Location_ID = L.Location_ID
@@ -125,6 +139,10 @@ namespace WebApplication1.DataAccess
                     ON E.Designation_ID = G.Designation_ID
                 INNER JOIN dbo.EducationLevel AS EL
                     ON E.Education_ID = EL.Education_ID
+                LEFT JOIN dbo.PoliceStation AS PS
+                    ON PS.PoliceStation_ID = E.PoliceStationID
+                LEFT JOIN dbo.ElectionDivision AS ED
+                    ON ED.ElectionDivision_ID = E.ElectionDivisionID
                 WHERE E.Employee_ID = @EmployeeID;";
 
             try
@@ -149,7 +167,6 @@ namespace WebApplication1.DataAccess
                     response.StatusCode = 404;
                     response.Result = "Employee not found";
                     response.ResultSet = employeeList;
-
                     return response;
                 }
 
@@ -167,6 +184,9 @@ namespace WebApplication1.DataAccess
             return response;
         }
 
+        
+        // 3. SAVE EMPLOYEE
+        
         public Response SaveEmployee(EmployeeRequestAPI requestAPI)
         {
             Response response = new Response();
@@ -186,7 +206,6 @@ namespace WebApplication1.DataAccess
                 response.StatusCode = 400;
                 response.Result = "Valid employee details are required";
                 response.ResultSet = null;
-
                 return response;
             }
 
@@ -247,6 +266,9 @@ namespace WebApplication1.DataAccess
             return response;
         }
 
+        
+        // 4. UPDATE EMPLOYEE
+
         public Response UpdateEmployee(EmployeeRequestAPI requestAPI)
         {
             Response response = new Response();
@@ -269,7 +291,6 @@ namespace WebApplication1.DataAccess
                 response.StatusCode = 400;
                 response.Result = "Valid employee details are required";
                 response.ResultSet = null;
-
                 return response;
             }
 
@@ -310,7 +331,6 @@ namespace WebApplication1.DataAccess
                     response.StatusCode = 404;
                     response.Result = "Employee not found";
                     response.ResultSet = null;
-
                     return response;
                 }
 
@@ -328,17 +348,14 @@ namespace WebApplication1.DataAccess
             return response;
         }
 
-        //Version 2.0 - New method to calculate distance to workplace
-        /// Retrieves employee details along with calculated distance to workplace
-        /// <param name="requestAPI">Contains EmployeeID and IncludeDistance flag</param>
-        /// <returns>Response with EmployeeDistanceModel containing employee + distance data</returns>
-        /// (///) This 3 Slashes Means Here is a XML Documentation Comment which can be used to generate API documentation and provide IntelliSense descriptions in IDEs.   
+        
+        // 5. GET EMPLOYEE DISTANCE TO WORKPLACE
+        // ================================================================
         public Response GetEmployeeDistanceToWorkplace(EmployeeRequestAPI requestAPI)
         {
             Response response = new Response();
             List<EmployeeDistanceModel> resultList = new List<EmployeeDistanceModel>();
 
-            // Step 1: Validate EmployeeID
             if (requestAPI == null || string.IsNullOrWhiteSpace(requestAPI.EmployeeID))
             {
                 response.StatusCode = 400;
@@ -356,7 +373,6 @@ namespace WebApplication1.DataAccess
                 return response;
             }
 
-            // Step 2: Query to get employee details
             string query = @"
                 SELECT
                     E.Employee_ID,
@@ -373,7 +389,11 @@ namespace WebApplication1.DataAccess
                     G.Designation_ID,
                     G.Designation_Name,
                     EL.Education_ID,
-                    EL.Education_Level
+                    EL.Education_Level,
+                    PS.PoliceStation_ID,
+                    PS.PoliceStation_Name,
+                    ED.ElectionDivision_ID,
+                    ED.ElectionDivision_Name
                 FROM dbo.EmployeeDetails AS E
                 INNER JOIN dbo.Location AS L
                     ON E.Location_ID = L.Location_ID
@@ -387,13 +407,16 @@ namespace WebApplication1.DataAccess
                     ON E.Designation_ID = G.Designation_ID
                 INNER JOIN dbo.EducationLevel AS EL
                     ON E.Education_ID = EL.Education_ID
+                LEFT JOIN dbo.PoliceStation AS PS
+                    ON PS.PoliceStation_ID = E.PoliceStationID
+                LEFT JOIN dbo.ElectionDivision AS ED
+                    ON ED.ElectionDivision_ID = E.ElectionDivisionID
                 WHERE E.Employee_ID = @EmployeeID;";
 
             try
             {
                 EmployeeModel employee = null;
 
-                // Step 3: Execute query and get employee data
                 using (DBconnect dbConnect = new DBconnect())
                 using (SqlConnection connection = dbConnect.GetOpenConnection())
                 using (SqlCommand command = new SqlCommand(query, connection))
@@ -409,7 +432,6 @@ namespace WebApplication1.DataAccess
                     }
                 }
 
-                // Step 4: Check if employee exists
                 if (employee == null)
                 {
                     response.StatusCode = 404;
@@ -418,12 +440,10 @@ namespace WebApplication1.DataAccess
                     return response;
                 }
 
-                // Step 5: Calculate distance to workplace using DistanceCalculator
                 var distanceToWorkplace = DistanceCalculator.GetDistanceToWorkplace(employee.LocationID);
                 var employeeCoords = DistanceCalculator.GetLocationCoordinates(employee.LocationID);
                 var workplaceCoords = DistanceCalculator.GetWorkplaceCoordinates();
 
-                // Step 6: Build distance model
                 var distanceModel = new EmployeeDistanceModel
                 {
                     Employee = employee,
@@ -438,7 +458,6 @@ namespace WebApplication1.DataAccess
 
                 resultList.Add(distanceModel);
 
-                // Step 7: Return response
                 response.StatusCode = 200;
                 response.Result = "Employee distance to workplace calculated successfully";
                 response.ResultSet = resultList;
@@ -453,11 +472,13 @@ namespace WebApplication1.DataAccess
             return response;
         }
 
-        // Model to hold employee details along with distance information
+        // ================================================================
+        // 6. NESTED CLASS: EmployeeDistanceModel
+        // ================================================================
         public class EmployeeDistanceModel
         {
             public EmployeeModel Employee { get; set; }
-            public decimal DistanceToWorkplace { get; set; } // We collect Distance in Kilometers
+            public decimal DistanceToWorkplace { get; set; }
             public string WorkplaceLocation { get; set; }
             public decimal EmployeeLatitude { get; set; }
             public decimal EmployeeLongitude { get; set; }
@@ -466,7 +487,10 @@ namespace WebApplication1.DataAccess
             public string FormattedDistance { get; set; }
         }
 
-        //Helper method to validate employee request and parse IDs
+        // ================================================================
+        // 7. PRIVATE HELPERS
+        // ================================================================
+
         private bool ValidateEmployeeRequest(
             EmployeeRequestAPI requestAPI,
             out int locationId,
@@ -514,8 +538,10 @@ namespace WebApplication1.DataAccess
             command.Parameters.Add("@EducationID", SqlDbType.Int).Value = educationId;
         }
 
-
-        /// Maps a SqlDataReader row to EmployeeModel
+        /// <summary>
+        /// Maps SqlDataReader to EmployeeModel
+        /// Handles DBNull for PoliceStation and ElectionDivision gracefully
+        /// </summary>
         private EmployeeModel MapEmployee(SqlDataReader reader)
         {
             return new EmployeeModel
@@ -536,13 +562,15 @@ namespace WebApplication1.DataAccess
                 EducationID = reader["Education_ID"].ToString(),
                 EducationLevel = reader["Education_Level"].ToString(),
 
-                // NEW: PoliceStation and ElectionDivision (currently NULL in DB)
+                // PoliceStation – handles NULL
                 PoliceStationID = reader["PoliceStation_ID"] != DBNull.Value
                     ? reader["PoliceStation_ID"].ToString()
                     : null,
                 PoliceStationName = reader["PoliceStation_Name"] != DBNull.Value
                     ? reader["PoliceStation_Name"].ToString()
                     : null,
+
+                // ElectionDivision – handles NULL
                 ElectionDivisionID = reader["ElectionDivision_ID"] != DBNull.Value
                     ? reader["ElectionDivision_ID"].ToString()
                     : null,
