@@ -304,6 +304,7 @@
     <Compile Include="BusinessLayer\DistanceCalculator.cs" />
     <Compile Include="Controllers\ElectionLeaveController.cs" />
     <Compile Include="Controllers\EmployeeController.cs" />
+    <Compile Include="Controllers\EmployeeDistanceController.cs" />
     <Compile Include="Controllers\EmployeeReportController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\MasterDataController.cs" />

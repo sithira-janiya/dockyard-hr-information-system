@@ -12,10 +12,8 @@ namespace WebApplication1.DataAccess
 {
     public class DAEmployee : IEmployee
     {
-        // ================================================================
-        // EXISTING METHODS (Unchanged)
-        // ================================================================
 
+        //Version 1.0
         public Response GetEmployeeDetails(EmployeeRequestAPI requestAPI)
         {
             Response response = new Response();
@@ -330,15 +328,11 @@ namespace WebApplication1.DataAccess
             return response;
         }
 
-        // ================================================================
-        // NEW METHOD: Get Employee Distance to Workplace
-        // ================================================================
-
-        /// <summary>
+        //Version 2.0 - New method to calculate distance to workplace
         /// Retrieves employee details along with calculated distance to workplace
-        /// </summary>
         /// <param name="requestAPI">Contains EmployeeID and IncludeDistance flag</param>
         /// <returns>Response with EmployeeDistanceModel containing employee + distance data</returns>
+        /// (///) This 3 Slashes Means Here is a XML Documentation Comment which can be used to generate API documentation and provide IntelliSense descriptions in IDEs.   
         public Response GetEmployeeDistanceToWorkplace(EmployeeRequestAPI requestAPI)
         {
             Response response = new Response();
@@ -459,17 +453,11 @@ namespace WebApplication1.DataAccess
             return response;
         }
 
-        // ================================================================
-        // NESTED CLASS: Employee Distance Model (Response Object)
-        // ================================================================
-
-        /// <summary>
-        /// Response model containing employee details with distance information
-        /// </summary>
+        // Model to hold employee details along with distance information
         public class EmployeeDistanceModel
         {
             public EmployeeModel Employee { get; set; }
-            public decimal DistanceToWorkplace { get; set; } // in kilometers
+            public decimal DistanceToWorkplace { get; set; } // We collect Distance in Kilometers
             public string WorkplaceLocation { get; set; }
             public decimal EmployeeLatitude { get; set; }
             public decimal EmployeeLongitude { get; set; }
@@ -478,10 +466,7 @@ namespace WebApplication1.DataAccess
             public string FormattedDistance { get; set; }
         }
 
-        // ================================================================
-        // PRIVATE HELPER METHODS
-        // ================================================================
-
+        //Helper method to validate employee request and parse IDs
         private bool ValidateEmployeeRequest(
             EmployeeRequestAPI requestAPI,
             out int locationId,
@@ -529,9 +514,8 @@ namespace WebApplication1.DataAccess
             command.Parameters.Add("@EducationID", SqlDbType.Int).Value = educationId;
         }
 
-        /// <summary>
+
         /// Maps a SqlDataReader row to EmployeeModel
-        /// </summary>
         private EmployeeModel MapEmployee(SqlDataReader reader)
         {
             return new EmployeeModel
