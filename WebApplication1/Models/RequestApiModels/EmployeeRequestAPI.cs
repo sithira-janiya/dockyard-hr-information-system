@@ -13,7 +13,11 @@ namespace WebApplication1.Models.RequestApiModels
         public string DesignationID { get; set; }
         public string EducationID { get; set; }
 
+        //#2 Updated 
         public string PoliceStationID { get; set; }
         public string ElectionDivisionID { get; set; }
+
+        //#2 Updated 
+        public bool IncludeDistance { get; set; } = false;
     }
 }
