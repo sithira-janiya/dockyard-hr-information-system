@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
+using WebApplication1.BusinessLayer;  // ← NEW: For DistanceCalculator
 using WebApplication1.Database_Layer;
 using WebApplication1.Interfaces;
 using WebApplication1.Models;
@@ -11,6 +12,10 @@ namespace WebApplication1.DataAccess
 {
     public class DAEmployee : IEmployee
     {
+        // ================================================================
+        // EXISTING METHODS (Unchanged)
+        // ================================================================
+
         public Response GetEmployeeDetails(EmployeeRequestAPI requestAPI)
         {
             Response response = new Response();
@@ -325,6 +330,158 @@ namespace WebApplication1.DataAccess
             return response;
         }
 
+        // ================================================================
+        // NEW METHOD: Get Employee Distance to Workplace
+        // ================================================================
+
+        /// <summary>
+        /// Retrieves employee details along with calculated distance to workplace
+        /// </summary>
+        /// <param name="requestAPI">Contains EmployeeID and IncludeDistance flag</param>
+        /// <returns>Response with EmployeeDistanceModel containing employee + distance data</returns>
+        public Response GetEmployeeDistanceToWorkplace(EmployeeRequestAPI requestAPI)
+        {
+            Response response = new Response();
+            List<EmployeeDistanceModel> resultList = new List<EmployeeDistanceModel>();
+
+            // Step 1: Validate EmployeeID
+            if (requestAPI == null || string.IsNullOrWhiteSpace(requestAPI.EmployeeID))
+            {
+                response.StatusCode = 400;
+                response.Result = "A valid EmployeeID is required";
+                response.ResultSet = null;
+                return response;
+            }
+
+            int employeeId;
+            if (!int.TryParse(requestAPI.EmployeeID, out employeeId))
+            {
+                response.StatusCode = 400;
+                response.Result = "Invalid EmployeeID format";
+                response.ResultSet = null;
+                return response;
+            }
+
+            // Step 2: Query to get employee details
+            string query = @"
+                SELECT
+                    E.Employee_ID,
+                    E.Employee_Name,
+                    E.Employee_Address,
+                    L.Location_ID,
+                    L.Location_Name,
+                    D.Department_ID,
+                    D.Department_Name,
+                    V.Division_ID,
+                    V.Division_Name,
+                    T.Town_ID,
+                    T.Town_Name,
+                    G.Designation_ID,
+                    G.Designation_Name,
+                    EL.Education_ID,
+                    EL.Education_Level
+                FROM dbo.EmployeeDetails AS E
+                INNER JOIN dbo.Location AS L
+                    ON E.Location_ID = L.Location_ID
+                INNER JOIN dbo.Department AS D
+                    ON L.Department_ID = D.Department_ID
+                INNER JOIN dbo.Division AS V
+                    ON D.Division_ID = V.Division_ID
+                INNER JOIN dbo.Town AS T
+                    ON E.Town_ID = T.Town_ID
+                INNER JOIN dbo.Designation AS G
+                    ON E.Designation_ID = G.Designation_ID
+                INNER JOIN dbo.EducationLevel AS EL
+                    ON E.Education_ID = EL.Education_ID
+                WHERE E.Employee_ID = @EmployeeID;";
+
+            try
+            {
+                EmployeeModel employee = null;
+
+                // Step 3: Execute query and get employee data
+                using (DBconnect dbConnect = new DBconnect())
+                using (SqlConnection connection = dbConnect.GetOpenConnection())
+                using (SqlCommand command = new SqlCommand(query, connection))
+                {
+                    command.Parameters.Add("@EmployeeID", SqlDbType.Int).Value = employeeId;
+
+                    using (SqlDataReader reader = command.ExecuteReader())
+                    {
+                        if (reader.Read())
+                        {
+                            employee = MapEmployee(reader);
+                        }
+                    }
+                }
+
+                // Step 4: Check if employee exists
+                if (employee == null)
+                {
+                    response.StatusCode = 404;
+                    response.Result = "Employee not found";
+                    response.ResultSet = null;
+                    return response;
+                }
+
+                // Step 5: Calculate distance to workplace using DistanceCalculator
+                var distanceToWorkplace = DistanceCalculator.GetDistanceToWorkplace(employee.LocationID);
+                var employeeCoords = DistanceCalculator.GetLocationCoordinates(employee.LocationID);
+                var workplaceCoords = DistanceCalculator.GetWorkplaceCoordinates();
+
+                // Step 6: Build distance model
+                var distanceModel = new EmployeeDistanceModel
+                {
+                    Employee = employee,
+                    DistanceToWorkplace = distanceToWorkplace,
+                    WorkplaceLocation = DistanceCalculator.GetWorkplaceName(),
+                    EmployeeLatitude = employeeCoords.Lat,
+                    EmployeeLongitude = employeeCoords.Lon,
+                    WorkplaceLatitude = workplaceCoords.Lat,
+                    WorkplaceLongitude = workplaceCoords.Lon,
+                    FormattedDistance = DistanceCalculator.FormatDistance(distanceToWorkplace)
+                };
+
+                resultList.Add(distanceModel);
+
+                // Step 7: Return response
+                response.StatusCode = 200;
+                response.Result = "Employee distance to workplace calculated successfully";
+                response.ResultSet = resultList;
+            }
+            catch (Exception exception)
+            {
+                response.StatusCode = 500;
+                response.Result = exception.Message;
+                response.ResultSet = null;
+            }
+
+            return response;
+        }
+
+        // ================================================================
+        // NESTED CLASS: Employee Distance Model (Response Object)
+        // ================================================================
+
+        /// <summary>
+        /// Response model containing employee details with distance information
+        /// </summary>
+        public class EmployeeDistanceModel
+        {
+            public EmployeeModel Employee { get; set; }
+            public decimal DistanceToWorkplace { get; set; } // in kilometers
+            public string WorkplaceLocation { get; set; }
+            public decimal EmployeeLatitude { get; set; }
+            public decimal EmployeeLongitude { get; set; }
+            public decimal WorkplaceLatitude { get; set; }
+            public decimal WorkplaceLongitude { get; set; }
+            public string FormattedDistance { get; set; }
+        }
+
+        // ================================================================
+        // PRIVATE HELPER METHODS
+        // ================================================================
+
         private bool ValidateEmployeeRequest(
             EmployeeRequestAPI requestAPI,
             out int locationId,
@@ -372,6 +529,9 @@ namespace WebApplication1.DataAccess
             command.Parameters.Add("@EducationID", SqlDbType.Int).Value = educationId;
         }
 
+        /// <summary>
+        /// Maps a SqlDataReader row to EmployeeModel
+        /// </summary>
         private EmployeeModel MapEmployee(SqlDataReader reader)
         {
             return new EmployeeModel
@@ -390,7 +550,27 @@ namespace WebApplication1.DataAccess
                 DesignationID = reader["Designation_ID"].ToString(),
                 DesignationName = reader["Designation_Name"].ToString(),
                 EducationID = reader["Education_ID"].ToString(),
-                EducationLevel = reader["Education_Level"].ToString()
+                EducationLevel = reader["Education_Level"].ToString(),
+
+                // NEW: PoliceStation and ElectionDivision (currently NULL in DB)
+                PoliceStationID = reader["PoliceStation_ID"] != DBNull.Value
+                    ? reader["PoliceStation_ID"].ToString()
+                    : null,
+                PoliceStationName = reader["PoliceStation_Name"] != DBNull.Value
+                    ? reader["PoliceStation_Name"].ToString()
+                    : null,
+                ElectionDivisionID = reader["ElectionDivision_ID"] != DBNull.Value
+                    ? reader["ElectionDivision_ID"].ToString()
+                    : null,
+                ElectionDivisionName = reader["ElectionDivision_Name"] != DBNull.Value
+                    ? reader["ElectionDivision_Name"].ToString()
+                    : null,
+
+                // Distance properties (will be populated separately)
+                Latitude = null,
+                Longitude = null,
+                DistanceToWorkplace = null,
+                WorkplaceLocation = null
             };
         }
     }
