@@ -1,4 +1,6 @@
-﻿namespace WebApplication1.Models
+﻿using System;
+
+namespace WebApplication1.Models
 {
     public class EmployeeModel
     {
@@ -24,10 +26,20 @@
         public string EducationID { get; set; }
         public string EducationLevel { get; set; }
 
+        //#1 Updated
         public string PoliceStationID { get; set; }
         public string PoliceStationName { get; set; }
 
+        //#1 Updated
         public string ElectionDivisionID { get; set; }
         public string ElectionDivisionName { get; set; }
+
+        //#1 Updated
+        public decimal? Latitude { get; set; }
+        public decimal? Longitude { get; set; }
+
+        //#1 Updated
+        public decimal? DistanceToWorkplace { get; set; }
+        public string WorkplaceLocation { get; set; }
     }
 }
