@@ -301,6 +301,7 @@
     <Compile Include="App_Start\FilterConfig.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="App_Start\UnityConfig.cs" />
+    <Compile Include="BusinessLayer\DistanceCalculator.cs" />
     <Compile Include="Controllers\ElectionLeaveController.cs" />
     <Compile Include="Controllers\EmployeeController.cs" />
     <Compile Include="Controllers\EmployeeReportController.cs" />
@@ -308,7 +309,6 @@
     <Compile Include="Controllers\MasterDataController.cs" />
     <Compile Include="Controllers\TestController.cs" />
     <Compile Include="Controllers\UserController.cs" />
-    <Compile Include="DataAccess\DAElectionLeave.cs" />
     <Compile Include="DataAccess\DAEmployee.cs" />
     <Compile Include="DataAccess\DAEmployeeReport.cs" />
     <Compile Include="DataAccess\DAMasterData.cs" />
@@ -324,7 +324,6 @@
     <Compile Include="Interfaces\IMasterData.cs" />
     <Compile Include="Interfaces\ITest.cs" />
     <Compile Include="Interfaces\IUser.cs" />
-    <Compile Include="Models\ElectionLeaveModel.cs" />
     <Compile Include="Models\EmployeeModel.cs" />
     <Compile Include="Models\ProcedureDBModel.cs" />
     <Compile Include="Models\RequestAPI.cs" />
@@ -392,7 +391,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
-    <Folder Include="BusinessLayer\" />
     <Folder Include="Views\Employee\" />
     <Folder Include="Views\Test\" />
     <Folder Include="Views\User\" />

@@ -6,6 +6,7 @@ using WebApplication1.Interfaces;
 using WebApplication1.Models;
 using WebApplication1.Models.RequestApiModels;
 
+
 namespace WebApplication1.DataAccess
 {
     public class DAMasterData : IMasterData
@@ -104,7 +105,17 @@ namespace WebApplication1.DataAccess
             return ExecuteMasterDataQuery(query, null);
         }
 
-        
+        public Response GetElectionDivisions(MasterDataRequestAPI requestAPI)
+        {
+            string query = @"
+        SELECT ElectionDivision_ID, ElectionDivision_Name
+        FROM dbo.ElectionDivision
+        ORDER BY ElectionDivision_Name";
+
+            return ExecuteMasterDataQuery(query, null);
+        }
+
+
 
         private Response ExecuteMasterDataQuery(string query, List<SqlParameter> parameters)
         {

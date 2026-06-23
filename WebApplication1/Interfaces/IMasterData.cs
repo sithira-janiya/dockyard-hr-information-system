@@ -11,7 +11,6 @@ namespace WebApplication1.Interfaces
         Response GetTowns(MasterDataRequestAPI requestAPI);
         Response GetDesignations(MasterDataRequestAPI requestAPI);
         Response GetEducationLevels(MasterDataRequestAPI requestAPI);
-
         Response GetPoliceStations(MasterDataRequestAPI requestAPI);
         Response GetElectionDivisions(MasterDataRequestAPI requestAPI);
     }
